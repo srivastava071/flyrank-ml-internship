@@ -1,424 +1,592 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Content Decline Prediction — FlyRank ML Capstone</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+  <title>Identifying Content at Risk of Decline | Himanshu Srivastava</title>
 
-        body {
-            margin: 0;
-            font-family: Arial, Helvetica, sans-serif;
-            line-height: 1.7;
-            color: #1f2937;
-            background: #f7f8fa;
-        }
+  <style>
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background: #f7f8fa;
+      color: #17202a;
+      line-height: 1.7;
+    }
 
-        header {
-            background: #111827;
-            color: white;
-            padding: 70px 20px;
-        }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 60px 24px;
+    }
 
-        .container {
-            max-width: 1000px;
-            margin: auto;
-            padding: 0 20px;
-        }
+    .hero {
+      background: white;
+      padding: 48px;
+      border-radius: 20px;
+      margin-bottom: 28px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
 
-        header h1 {
-            font-size: 42px;
-            line-height: 1.2;
-            margin-bottom: 20px;
-        }
+    .eyebrow {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #667085;
+    }
 
-        header p {
-            font-size: 18px;
-            color: #d1d5db;
-            max-width: 800px;
-        }
+    h1 {
+      font-size: 46px;
+      line-height: 1.15;
+      margin: 14px 0 18px;
+      letter-spacing: -1.5px;
+    }
 
-        section {
-            background: white;
-            margin: 25px auto;
-            padding: 35px;
-            border-radius: 12px;
-            max-width: 1000px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
+    h2 {
+      font-size: 28px;
+      margin-top: 50px;
+      margin-bottom: 18px;
+    }
 
-        h2 {
-            color: #111827;
-            margin-top: 0;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 10px;
-        }
+    h3 {
+      font-size: 20px;
+      margin-top: 28px;
+    }
 
-        h3 {
-            color: #374151;
-        }
+    p {
+      color: #475467;
+    }
 
-        .highlight {
-            background: #f3f4f6;
-            padding: 20px;
-            border-left: 4px solid #111827;
-            margin: 20px 0;
-        }
+    .author {
+      font-weight: 600;
+      color: #344054;
+    }
 
-        .metric-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 25px 0;
-        }
+    section {
+      background: white;
+      padding: 38px;
+      border-radius: 18px;
+      margin-bottom: 24px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.04);
+    }
 
-        .metric {
-            background: #f3f4f6;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-        }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin: 25px 0;
+    }
 
-        .metric strong {
-            display: block;
-            font-size: 28px;
-            color: #111827;
-        }
+    .metric {
+      background: #f8fafc;
+      border: 1px solid #eaecf0;
+      border-radius: 14px;
+      padding: 22px;
+    }
 
-        ul {
-            padding-left: 25px;
-        }
+    .metric-number {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
 
-        a {
-            color: #2563eb;
-        }
+    .metric-label {
+      color: #667085;
+      font-size: 14px;
+    }
 
-        footer {
-            text-align: center;
-            padding: 40px 20px;
-            color: #6b7280;
-        }
+    ul {
+      padding-left: 22px;
+    }
 
-        @media (max-width: 600px) {
-            header h1 {
-                font-size: 30px;
-            }
+    li {
+      margin-bottom: 10px;
+      color: #475467;
+    }
 
-            section {
-                padding: 25px 20px;
-            }
-        }
-    </style>
+    .highlight {
+      border-left: 4px solid #344054;
+      padding: 16px 20px;
+      background: #f8fafc;
+      margin: 24px 0;
+    }
+
+    .recommendation {
+      border: 1px solid #eaecf0;
+      padding: 20px;
+      border-radius: 14px;
+      margin: 16px 0;
+    }
+
+    .recommendation strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .footer {
+      text-align: center;
+      color: #667085;
+      padding: 30px 0;
+      font-size: 14px;
+    }
+
+    a {
+      color: #175cd3;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 650px) {
+      h1 {
+        font-size: 36px;
+      }
+
+      .hero,
+      section {
+        padding: 26px;
+      }
+
+      .metric-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<header>
-    <div class="container">
-        <p>FlyRank ML Internship · Machine Learning Capstone</p>
+<div class="container">
 
-        <h1>
-            Identifying Content at Risk of Decline
-        </h1>
+  <!-- HERO -->
 
-        <p>
-            An applied machine learning study using pseudonymized content
-            performance data to create a decision-support workflow for
-            content refresh prioritization.
-        </p>
+  <div class="hero">
 
-        <p>
-            <strong>Author:</strong> Himanshu Srivastava
-        </p>
+    <div class="eyebrow">
+      FlyRank ML Internship · Machine Learning Capstone
     </div>
-</header>
+
+    <h1>
+      Identifying Content at Risk of Decline
+    </h1>
+
+    <p>
+      An applied machine learning study using pseudonymized content-performance
+      data to create a decision-support workflow for content refresh prioritization.
+    </p>
+
+    <p class="author">
+      Author: Himanshu Srivastava · 2026
+    </p>
+
+  </div>
 
 
-<section>
+  <!-- 0. ABSTRACT -->
+
+  <section>
+
     <h2>Abstract</h2>
 
     <p>
-        This study asks whether historical content-performance signals can
-        help identify content that may be at risk of decline and therefore
-        deserve human review. The analysis uses the FlyRank ML Internship
-        dataset and evaluates content using historical performance,
-        search-query visibility, and content-age signals. A Random Forest
-        model was evaluated using both a row-random split and a
-        client-grouped split to test whether performance remained directional
-        when content from the same client was kept together. The measured
-        average precision was 0.4131 under the client-grouped evaluation,
-        compared with 0.3874 under the row-random split, with a test-set
-        positive rate of 23.87% for the grouped evaluation. The resulting
-        output is intended as decision-support for prioritizing human review,
-        not as an automated decision about whether content will decline.
+      This study asks whether historical content-performance signals can help
+      identify content that may be at risk of decline and therefore deserve
+      human review. The analysis uses the FlyRank ML Internship dataset and
+      evaluates content using historical performance, search-query visibility,
+      and content-age signals. A Random Forest model was evaluated using both
+      a row-random split and a client-grouped split to examine whether the
+      observed ranking signal transferred when content from the same client
+      was kept together. The measured Average Precision was 0.4131 under the
+      client-grouped evaluation, compared with 0.3874 under the row-random
+      split, while the grouped test set had a positive rate of 23.87%.
+      The resulting output is intended as decision-support for prioritizing
+      human review, not as an automated decision about whether content will
+      decline.
     </p>
-</section>
+
+  </section>
 
 
-<section>
+  <!-- 1. INTRODUCTION -->
+
+  <section>
+
     <h2>1. Introduction / Problem</h2>
 
     <p>
-        Content teams manage large numbers of pages and cannot manually
-        review every page with the same level of attention. A useful
-        decision-support system can help surface content that deserves
-        earlier human investigation.
+      Content teams manage large numbers of pages and cannot manually review
+      every page with the same level of attention. A useful decision-support
+      system can help surface content that deserves earlier human investigation.
     </p>
 
     <p>
-        The question explored here is:
-        <strong>
-            Can historical content-performance signals help rank content
-            for potential refresh or review?
-        </strong>
-    </p>
-
-    <p>
-        The intended decision is prioritization. The model does not decide
-        whether a page should be changed. Instead, it provides a ranked
-        queue that an editor or analyst can inspect.
-    </p>
-</section>
-
-
-<section>
-    <h2>2. Data</h2>
-
-    <p>
-        The analysis was developed using the FlyRank ML Internship dataset.
-        The internship data contains pseudonymized content-performance
-        information and client identifiers used for grouping and evaluation.
-    </p>
-
-    <p>
-        The modeling workflow used historical 30-day performance signals,
-        search-query visibility measures, and content age.
+      The question explored here is:
     </p>
 
     <div class="highlight">
-        <strong>Public-safety principle:</strong>
-        Client and content identifiers were treated as grouping or
-        reference fields and were not used as predictive model features.
+      <strong>
+        Can historical content-performance signals help rank content for
+        potential refresh or review?
+      </strong>
     </div>
 
     <p>
-        Outcome-derived fields were deliberately excluded from the model.
-        In particular, trend-related fields were not used as predictors
-        because they are connected to the target definition.
+      The intended decision is prioritization. The model does not decide
+      whether a page should be changed. Instead, it produces a ranked queue
+      that an editor or analyst can inspect.
     </p>
-</section>
+
+    <p>
+      This framing treats machine learning as a way to support limited human
+      attention rather than as an automated content decision-maker.
+    </p>
+
+  </section>
 
 
-<section>
-    <h2>3. Methodology</h2>
+  <!-- 2. DATA -->
 
-    <h3>Features</h3>
+  <section>
+
+    <h2>2. Data</h2>
+
+    <p>
+      The analysis was developed using the FlyRank ML Internship dataset.
+      The internship data contains pseudonymized content-performance information
+      and client identifiers used for grouping and evaluation.
+    </p>
+
+    <p>
+      The modeling workflow used historical 30-day performance signals,
+      search-query visibility measures, and content-age information.
+    </p>
+
+    <h3>Model features</h3>
 
     <ul>
-        <li>Previous 30-day impressions</li>
-        <li>Previous 30-day clicks</li>
-        <li>Previous 30-day average position</li>
-        <li>Visible query count</li>
-        <li>Top-query share</li>
-        <li>Content age in days</li>
+      <li>Previous 30-day impressions</li>
+      <li>Previous 30-day clicks</li>
+      <li>Previous 30-day average position</li>
+      <li>Visible query count</li>
+      <li>Top-query share</li>
+      <li>Content age in days</li>
     </ul>
 
-    <h3>Validation</h3>
+    <h3>Excluded information</h3>
 
     <p>
-        Two validation designs were compared. The first used a row-random
-        split. The second used a client-grouped split so that content from
-        the same client did not appear across both training and test sets.
+      Outcome-derived fields were deliberately excluded from the model.
+      In particular, trend-related fields were not used as predictors because
+      they are connected to the target definition.
     </p>
 
     <p>
-        The grouped evaluation provides a more conservative test of whether
-        the model's ranking behavior transfers to clients not represented
-        in training.
+      Client and content identifiers were treated as grouping or reference
+      fields and were not used as predictive model features.
+    </p>
+
+    <div class="highlight">
+      <strong>Public-safety principle:</strong>
+      No client-identifying details or private search queries are presented
+      in this research artifact.
+    </div>
+
+  </section>
+
+
+  <!-- 3. METHODOLOGY -->
+
+  <section>
+
+    <h2>3. Methodology</h2>
+
+    <h3>Model</h3>
+
+    <p>
+      A Random Forest classifier was used to estimate which content items
+      should receive higher priority for review based on the available
+      historical signals.
+    </p>
+
+    <h3>Validation design</h3>
+
+    <p>
+      Two validation designs were compared.
+    </p>
+
+    <p>
+      The first used a row-random split. The second used a client-grouped
+      split so that content from the same client did not appear across both
+      training and test sets.
+    </p>
+
+    <p>
+      The grouped evaluation provides a different and more stringent test of
+      whether the observed ranking behavior transfers to clients not represented
+      in training.
     </p>
 
     <h3>Leakage audit</h3>
 
     <p>
-        The final feature set was checked for known label-derived fields,
-        outcome fields, and identifier features. The audit found no known
-        label-derived or outcome columns in the final model features.
+      The final feature set was checked for known label-derived fields,
+      outcome fields, and identifier features. The audit found no known
+      label-derived or outcome columns in the final model features.
     </p>
-</section>
+
+    <p>
+      The validation workflow also treated client identifiers as grouping
+      variables rather than predictive inputs.
+    </p>
+
+  </section>
 
 
-<section>
+  <!-- 4. RESULTS -->
+
+  <section>
+
     <h2>4. Results</h2>
 
     <div class="metric-grid">
 
-        <div class="metric">
-            <strong>0.3874</strong>
-            Random-split Average Precision
+      <div class="metric">
+        <div class="metric-number">0.3874</div>
+        <div class="metric-label">
+          Random-split Average Precision
         </div>
+      </div>
 
-        <div class="metric">
-            <strong>0.7436</strong>
-            Random-split ROC-AUC
+      <div class="metric">
+        <div class="metric-number">0.7436</div>
+        <div class="metric-label">
+          Random-split ROC-AUC
         </div>
+      </div>
 
-        <div class="metric">
-            <strong>0.4131</strong>
-            Client-grouped Average Precision
+      <div class="metric">
+        <div class="metric-number">0.4131</div>
+        <div class="metric-label">
+          Client-grouped Average Precision
         </div>
+      </div>
 
-        <div class="metric">
-            <strong>0.7315</strong>
-            Client-grouped ROC-AUC
+      <div class="metric">
+        <div class="metric-number">0.7315</div>
+        <div class="metric-label">
+          Client-grouped ROC-AUC
         </div>
+      </div>
 
     </div>
+
+    <h3>Base-rate context</h3>
+
+    <p>
+      The client-grouped test set had a positive rate of 23.87%.
+      The measured Average Precision of 0.4131 was above this prevalence
+      baseline, providing directional evidence of ranking signal in this
+      evaluation.
+    </p>
+
+    <h3>What changed across validation designs?</h3>
+
+    <p>
+      The row-random split measured an Average Precision of 0.3874,
+      while the client-grouped evaluation measured 0.4131.
+      ROC-AUC changed from 0.7436 to 0.7315.
+    </p>
+
+    <p>
+      The difference between validation designs is itself informative:
+      it demonstrates why the choice of split matters when multiple
+      observations belong to the same client.
+    </p>
 
     <div class="highlight">
-        <strong>Measured result:</strong>
-        The client-grouped evaluation produced an average precision of
-        0.4131. Its test positive rate was 23.87%.
+      <strong>Interpretation:</strong>
+      These measurements provide directional evidence for ranking and
+      prioritization. They do not establish causality or guarantee future
+      performance on individual content items.
     </div>
 
-    <p>
-        The difference between the two validation designs is itself useful:
-        it shows why validation design matters when multiple observations
-        belong to the same client.
-    </p>
-
-    <p>
-        These results are directional evidence for ranking and prioritization,
-        not evidence of causality or guaranteed future performance.
-    </p>
-</section>
+  </section>
 
 
-<section>
-    <h2>5. Limitations & Honest Framing</h2>
+  <!-- 5. LIMITATIONS -->
+
+  <section>
+
+    <h2>5. Limitations &amp; Honest Framing</h2>
 
     <ul>
-        <li>
-            The model identifies statistical patterns in the available
-            dataset; it does not establish causal relationships.
-        </li>
 
-        <li>
-            A high model score does not mean that a page will definitely
-            decline.
-        </li>
+      <li>
+        The model identifies statistical patterns in the available dataset;
+        it does not establish causal relationships.
+      </li>
 
-        <li>
-            The ranked queue should be reviewed by a human before any
-            content change is made.
-        </li>
+      <li>
+        A high model score does not mean that a page will definitely decline.
+      </li>
 
-        <li>
-            Model performance may change when data distributions,
-            search behavior, or content environments change.
-        </li>
+      <li>
+        The ranked queue should be reviewed by a human before any content
+        change is made.
+      </li>
 
-        <li>
-            The analysis should not be interpreted as predicting a search
-            engine's internal algorithm or future ranking decisions.
-        </li>
+      <li>
+        Model performance may change when data distributions, search behavior,
+        or content environments change.
+      </li>
+
+      <li>
+        The analysis should not be interpreted as predicting a search engine's
+        internal algorithm or future ranking decisions.
+      </li>
+
+      <li>
+        The evaluation measures performance on the available validation
+        population and should not be treated as a guarantee of production
+        performance.
+      </li>
+
     </ul>
-</section>
+
+  </section>
 
 
-<section>
+  <!-- 6. RECOMMENDATIONS -->
+
+  <section>
+
     <h2>6. Ranked Recommendations</h2>
 
-    <h3>1. Review high-priority content first</h3>
+    <div class="recommendation">
 
-    <p>
+      <strong>1. Review high-priority content first</strong>
+
+      <p>
         Use the model's ranking as a triage queue so analysts can focus
         attention on content with higher measured decline probability.
-    </p>
+      </p>
 
-    <h3>2. Investigate recent performance changes</h3>
+    </div>
 
-    <p>
+    <div class="recommendation">
+
+      <strong>2. Investigate recent performance changes</strong>
+
+      <p>
         Review recent impressions, clicks, and average-position signals
         alongside the model score before deciding whether an update is
         appropriate.
-    </p>
+      </p>
 
-    <h3>3. Check search visibility</h3>
+    </div>
 
-    <p>
+    <div class="recommendation">
+
+      <strong>3. Check search visibility</strong>
+
+      <p>
         Low query visibility can provide an additional reason for an analyst
         to investigate a page's search coverage.
-    </p>
+      </p>
 
-    <h3>4. Consider content age</h3>
+    </div>
 
-    <p>
+    <div class="recommendation">
+
+      <strong>4. Consider content age</strong>
+
+      <p>
         Older content can be reviewed for freshness, relevance, and whether
         its current information still matches the user's needs.
-    </p>
+      </p>
+
+    </div>
 
     <div class="highlight">
-        <strong>Important:</strong>
-        These recommendations are decision-support actions. They should not
-        be automated into publishing, deletion, or major content changes
-        without human review.
+
+      <strong>Human-review rule:</strong>
+
+      These recommendations are decision-support actions. They should not be
+      automated into publishing, deletion, or major content changes without
+      human review.
+
     </div>
-</section>
+
+  </section>
 
 
-<section>
+  <!-- 7. REPRODUCIBILITY -->
+
+  <section>
+
     <h2>7. Reproducibility</h2>
 
     <p>
-        The analysis notebooks and supporting artifacts are available in the
-        project repository.
+      The analysis notebooks and supporting artifacts are available in the
+      project repository.
     </p>
 
     <p>
-        <strong>Repository:</strong><br>
-        <a href="https://github.com/srivastava071/flyrank-ml-internship"
-           target="_blank">
-            GitHub Repository
-        </a>
+      <strong>Repository:</strong>
+      <a href="https://github.com/srivastava071/flyrank-ml-internship"
+         target="_blank">
+        GitHub Repository
+      </a>
     </p>
 
     <p>
-        The Week 6 validation audit and Week 7 content action playbook are
-        included under the project's notebook and work directories.
-    </p>
-</section>
-
-
-<section>
-    <h2>8. Acknowledgments & Data Credit</h2>
-
-    <p>
-        Built on the
-        <a href="https://flyrank.ai" target="_blank">
-            FlyRank ML Internship dataset
-        </a>.
+      The project includes the validation audit, content action playbook,
+      and capstone analysis under the project's work and notebook directories.
     </p>
 
     <p>
-        This project was completed as part of the FlyRank AI internship
-        program.
+      The Week 6 validation audit documents the grouped validation and
+      leakage checks, while the Week 7 action playbook turns the validated
+      ranking output into a human-review workflow.
     </p>
-</section>
+
+  </section>
 
 
-<footer>
+  <!-- 8. ACKNOWLEDGMENTS -->
+
+  <section>
+
+    <h2>8. Acknowledgments &amp; Data Credit</h2>
+
     <p>
-        FlyRank ML Internship · Machine Learning Capstone
+      Built on the
+      <a href="https://flyrank.ai/" target="_blank">
+        FlyRank ML Internship dataset
+      </a>.
     </p>
 
     <p>
-        Himanshu Srivastava · 2026
+      This project was completed as part of the FlyRank AI internship program.
     </p>
-</footer>
+
+  </section>
+
+
+  <!-- FOOTER -->
+
+  <div class="footer">
+
+    FlyRank ML Internship · Machine Learning Capstone<br>
+    Himanshu Srivastava · 2026
+
+  </div>
+
+</div>
 
 </body>
 </html>
